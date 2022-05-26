@@ -1,9 +1,10 @@
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import Entrar from './Entrar';
-import Cadastro from './Cadastro';
-import Habitos from './Habitos';
-import Hoje from './Hoje';
-import Historico from './Historico';
+import Entrar from './components/Entrar';
+import Cadastro from './components/Cadastro';
+import Habitos from './components/Habitos';
+import Hoje from './components/Hoje';
+import Historico from './components/Historico';
+import Topo from './components/Topo';
 
 function App(){
     return(
