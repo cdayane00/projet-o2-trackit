@@ -7,6 +7,7 @@ import { ThreeDots } from  'react-loader-spinner';
 
 function CriaHabito({criaFormHabito, setCriaFormHabito, listaHabito}){
     const [seleciona, setSeleciona] = useState(false);
+    const[diaSelecionado, setDiaSelecionado] = useState([]);
     const [habito, setHabito] = useState({nome: "", dias: []});
     const diasDaSemana = ["D","S","T","Q","Q","S","S"];
     const [carregando, setCarregando] = useState(false);
@@ -21,20 +22,22 @@ function CriaHabito({criaFormHabito, setCriaFormHabito, listaHabito}){
             setHabito({...habito, dias: [...habito.dias, dia]});
         }
     }
+    const body = {... habito};
 
     function cria(event){
         event.preventDefault();
 
-        if(habito.dias.length > 0){
+        if(habito.dias.length > 0 && habito.nome !== ""){
             setCarregando(true);
         }
         else{
-            alert("Selecione um dia da semana");
+            alert("Selecione um dia da semana e um nome pra o habito");
             return;
         }
 
         const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
-        const body = {...habito};
+        
+        console.log(body);
         const config = {
             headers: {
                 Authorization: `Bearer ${usuario.token}`,
