@@ -2,21 +2,47 @@ import react from "react";
 import styled from "styled-components";
 import logo from "../assets/img/logo.png";
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 
 function Cadastro(){
+    const navigate = useNavigate();
+    const [dadosCadastro, setDadosCadastro] = useState({email:"",senha:"",nome:"",foto:""});
+
+    function confirmarCadastro(event){
+        event.preventDefault();
+        const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up";
+        
+        const promise = axios.post(URL, {
+            email: dadosCadastro.email,
+            name: dadosCadastro.nome,
+            image: dadosCadastro.foto,
+            password: dadosCadastro.senha     
+        });
+
+        promise.then((response) => {
+            console.log("Sucesso");
+            navigate("/");
+        });
+
+        promise.catch(erro => alert(erro.response.statusText));
+    }
+    function irParaLogin(){
+        navigate("/");
+    }
     
     
     return(
         <TelaEntrar>
             <img className="logo" src={logo}/>  
-            <form>
-                <input className="input" type="email" placeholder="email"/>
-                <input className="input" type="password" placeholder="senha"/>
-                <input className="input" type="text" placeholder="nome"/>
-                <input className="input" type="url" placeholder="foto"/>
+            <form onSubmit={confirmarCadastro}>
+                <input className="input" type="email" placeholder="email" value={dadosCadastro.email} required onChange={e => setDadosCadastro({ ...dadosCadastro, email: e.target.value})}/>
+                <input className="input" type="password" placeholder="senha" value={dadosCadastro.senha} required onChange={e => setDadosCadastro({ ...dadosCadastro, senha: e.target.value})}/>
+                <input className="input" type="text" placeholder="nome" value={dadosCadastro.nome} required onChange={e => setDadosCadastro({ ...dadosCadastro, nome: e.target.value})}/>
+                <input className="input" type="url" placeholder="foto" value={dadosCadastro.foto} required onChange={e => setDadosCadastro({ ...dadosCadastro, foto: e.target.value})}/>
                 <button type="submit">Cadastrar</button>
-                <p>Já tem uma conta? Faça login!</p>
+                <p onClick={irParaLogin}>Já tem uma conta? Faça login!</p>
             </form>   
         </TelaEntrar>
     )

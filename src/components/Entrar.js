@@ -1,21 +1,69 @@
-import react from "react";
 import styled from "styled-components";
 import logo from "../assets/img/logo.png";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import UserContext from '../context/UserContext';
+import { useContext } from "react";
+import { ThreeDots } from  'react-loader-spinner';
 
 
 function Entrar(){
+    const navigate = useNavigate();
+    const [dadosLogin, setDadosLogin] = useState({email:"",senha:""});
+    const {usuario, setUsuario} = useContext(UserContext);
+    const [carregandoDados, setCarregandoDados] = useState({carregando: false, classeCarregando:""});
 
-    return(
+    function confirmarLogin(event){
+        event.preventDefault();
+        const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login";
+        
+        const promise = axios.post(URL, {
+            email: dadosLogin.email,
+            password: dadosLogin.senha     
+        });
+
+        promise.then((response) => {
+            localStorage.setItem("userdata", JSON.stringify({
+                name: response.data.name,
+                image: response.data.image,
+                email: response.data.email,
+                token: response.data.token
+            }));
+            
+            setUsuario({...usuario, name: dadosLogin.name, image: dadosLogin.image, email: dadosLogin.email, token: dadosLogin.token});
+            navigate('/hoje');       
+        });
+
+        setCarregandoDados({...carregandoDados, carregando: true, classeCarregando: "desabilita"});
+
+        promise.catch((erro) => {
+            alert(erro.response.statusText);
+            setCarregandoDados({...carregandoDados, carregando: false, classeCarregando: ""});
+        });
+    }
+
+    function irParaCadastro(){
+        navigate("/cadastro");
+    }
+
+    return (
         <TelaEntrar>
             <img className="logo" src={logo}/>  
-            <form>
-                <input className="input" type="email" placeholder="email"/>
-                <input className="input" type="password" placeholder="senha"/>
-                <button type="submit">Entrar</button>
-                <p>Não tem uma conta? Cadastre-se!</p>
+            <form onSubmit={confirmarLogin}>
+                <input type="email" placeholder="email" className={carregandoDados.classeCarregando} disabled={carregandoDados.carregando} value={dadosLogin.email} required onChange={e => setDadosLogin({ ...dadosLogin, email: e.target.value})}/>
+                <input  type="password" placeholder="senha" className={carregandoDados.classeCarregando} disabled={carregandoDados.carregando} value={dadosLogin.senha} required onChange={e => setDadosLogin({ ...dadosLogin, senha: e.target.value})}/>
+                {carregandoDados.carregando === false
+                ? <button type="submit">Entrar</button> 
+                : <button disabled>
+                    <ThreeDots color="rgba(255, 255, 255, 1)" height={13} width={51}/>
+                </button> 
+                }
+                <p onClick={irParaCadastro}>Não tem uma conta? Cadastre-se!</p>
             </form>   
         </TelaEntrar>
     )
+
 }
 export default Entrar;
 
@@ -29,7 +77,7 @@ const TelaEntrar = styled.div`
         font-size: 68.982px;
         line-height: 86px;
     }
-    .input{
+    input{
         width: 303px;
         height: 45px;
         margin-left: 30px;
@@ -44,6 +92,10 @@ const TelaEntrar = styled.div`
         font-size: 19.976px;
         line-height: 25px;
         color: #DBDBDB;
+    }
+    .desabilita{
+        background-color: rgba(212, 212, 212, 1);
+        color: rgba(175, 175, 175, 1);
     }
     button{
         width: 318px;

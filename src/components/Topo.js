@@ -12,14 +12,14 @@ function Topo(){
 export default Topo;
 
 const Cabecalho = styled.div`
-    width: 100%;
     height: 70px;
-    margin-left: -7px;
-    margin-top: -7px;
+    width:100%;
+    left: 0px;
+    top: 0px;
+    rigth:0;
     padding-top: 3px;
     display: flex;
     position: fixed;
-
     background-color: #126BA5;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
     
