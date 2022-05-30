@@ -31,7 +31,7 @@ function Entrar(){
                 token: response.data.token
             }));
             
-            setUsuario({...usuario, name: dadosLogin.name, image: dadosLogin.image, email: dadosLogin.email, token: dadosLogin.token});
+            setUsuario({...usuario, email: response.data.email, name: response.data.name, image: response.data.image, token: response.data.token});
             navigate('/hoje');       
         });
 

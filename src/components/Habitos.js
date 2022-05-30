@@ -1,37 +1,77 @@
 import styled from "styled-components";
-import bob from "../assets/img/bob.png";
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import CriaHabito from "./CriaHabito";
+
+import axios from "axios";
+import {useState, useEffect, useContext} from "react";
+import UserContext from "../context/UserContext";
+import {BsTrash} from  'react-icons/bs';
+import { BsPlusSquareFill } from "react-icons/bs";
 
 
 function Habitos(){
+    
+    const {usuario} = useContext(UserContext);
+    const diasDaSemana = ["D","S","T","Q","Q","S","S"];
+    const [habito, setHabito] = useState();
+    const [criaFormHabito, setCriaFormHabito] = useState(false);
+
+    function listaHabito(){
+        const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
+        const config = {
+            headers: {
+                Authorization: `Bearer ${usuario.token}`,
+            },
+        };
+        const promise = axios.get(URL, config);
+        promise.then((response)=>{
+            const{dados} = response;
+            setHabito(dados);
+        })
+        promise.catch((erro)=>{
+            alert(erro.response.statusText);
+        })
+    }
+
+    function excluiHabito(id){
+        if(window.confirm('Tem certeza que quer excluir esse hábito?')){
+            const URL = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`;
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${usuario.token}`,
+                },
+            };
+            const promise = axios.delete(URL, config);
+            promise.then(listaHabito);
+            promise.catch((erro)=>{
+                alert(erro.response.statusText);
+            });
+        };
+    }
+    useEffect(()=>{listaHabito();},[]);
     return(
         <Corpo>
-            <div className="corpo">
+            <DivHabitos>
                 <h1>Meus hábitos</h1>
-                <div className="botao">
-                    <h1>+</h1>
-                </div>
-                <div className="habito">
-                    <input className="input" type="text" placeholder="nome do hábito"/>
-                    <div className="dias">
-                        <div>D</div>
-                        <div>S</div>
-                        <div>T</div>
-                        <div>Q</div>
-                        <div>Q</div>
-                        <div>S</div>
-                        <div>S</div>
-                    </div>
-                    <div className="botoes">
-                        <p>Cancelar</p>
-                        <button>Salvar</button>
-                    </div>
-                    
-                    
-                </div>
-            </div>
-
+                <BsPlusSquareFill className="adiciona-habito" onClick={()=>setCriaFormHabito(!criaFormHabito)}/>
+            </DivHabitos>
+            <CriaHabito criaFormHabito={criaFormHabito} setCriaFormHabito={setCriaFormHabito} listaHabito={()=>listaHabito} />
+            {habito ? (
+                habito.map(({id,nome,dias})=>(
+                    <DivHabito className="habito">
+                        <p className="habito-nome">{nome}</p>
+                        <DiasHabito>
+                            {diasDaSemana.map((dia,i)=>{return(
+                                <DiaHabito className="dia" id={i} dias={dias} key={i}>
+                                    <p>{dia}</p>
+                                </DiaHabito>
+                            )})}
+                        </DiasHabito>
+                        <BsTrash className="trash-icon" onClick={()=>excluiHabito(id)}/>
+                    </DivHabito>
+                ))) : (
+                    <p>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</p>
+                )
+            }
         </Corpo>
         
     )
@@ -39,124 +79,91 @@ function Habitos(){
 export default Habitos;
 
 const Corpo = styled.div`
-    .corpo{
-        margin-top:100px;
-        display:flex;
-        flex-wrap: wrap;
-    }
-    .corpo h1{
-        width: 148px;
-        height: 29px;
-        margin-left: 17px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #E5E5E5;
+    min-width: 100vw;
+    min-height: 100vh;
+    padding-bottom: 100px;
+
+    p {
         font-family: 'Lexend Deca';
         font-style: normal;
         font-weight: 400;
-        font-size: 22.976px;
-        line-height: 29px;
-        color: #126BA5;
+        font-size: 17.976px;
+        color: #666666;
+        padding: 0 10px;
     }
-    .botao{
+`;
+
+const DivHabitos = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 375px;
+    padding: 92px 18px 20px 18px;
+    h1 {
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22.976px;
+    color: #126BA5;
+    }
+    .adiciona-habito {
         width: 40px;
         height: 35px;
-        margin-left: 140px;
-        margin-top: 5px;
-        margin-bottom: 20px;
-        background: #52B6FF;
-        border-radius: 4.63636px;
-    }
-    .botao h1{
-        width: 16px;
-        height: 34px;
-        margin-left: 12px;
-        margin-top: 0px;
-        font-family: 'Lexend Deca';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 26.976px;
-        line-height: 34px;
-        color: #FFFFFF;
-
-    }
-    .habito{
-        width: 340px;
-        height: 180px;
-        margin-left: 17px;
-        margin-top:0;
-        background: #FFFFFF;
-        border-radius: 5px;
-        
-    }
-    .habito input{
-        width: 303px;
-        height: 45px;
-        margin-left: 18px;
-        margin-top: 20px;
-        padding-left: 10px;
-        background: #FFFFFF;
-        border: 1px solid #D5D5D5;
-        border-radius: 5px;
-        font-family: 'Lexend Deca';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 19.976px;
-        line-height: 25px;
-        color: #DBDBDB;
-    }
-    .dias{
-        display:flex;
-        flex-wrap:wrap;
-        margin-top: 10px;
-        margin-left: 18px;
-    }
-    .dias div{
-        width: 30px;
-        height: 30px;
-        margin-right: 5px;
-        padding-left: 7px;
-        background: #FFFFFF;
-        border: 1px solid #D5D5D5;
-        border-radius: 5px;
-
-        font-family: 'Lexend Deca';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 19.976px;
-        line-height: 25px;
-        color: #DBDBDB;
-
-    }
-    .botoes{
-        display:flex;
-        flex-wrap:wrap;
-    }
-    .botoes p{
-        width: 69px;
-        height: 20px;
-        margin-left: 140px;
-        margin-top: 30px;
-        font-family: 'Lexend Deca';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 15.976px;
-        line-height: 20px;
-        text-align: center;
         color: #52B6FF;
     }
-    .botoes button{
-        width: 84px;
-        height: 35px;
-        margin-left: 25px;
-        margin-top: 22px;
-        border:0;
-        background: #52B6FF;
-        border-radius: 4.63636px;
-
+`;
+const DivHabito = styled.div`
+    width: 340px;
+    height: 91px;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+    position: relative;
+    margin-bottom: 10px;
+    .trash-icon {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 11px 10px 0 0;
+        color: rgba(102, 102, 102, 1);
+        font-size:15px;
+    }
+    .habito-nome {
         font-family: 'Lexend Deca';
         font-style: normal;
         font-weight: 400;
-        font-size: 15.976px;
-        line-height: 20px;
-        color: #FFFFFF;
-    }`
-    ;
+        font-size: 19.976px;
+        color: #666666;
+        padding-top: 13px;
+        padding-left: 15px;
+    }
+`;
+const DiasHabito = styled.div`
+    display: flex;
+    margin: 8px 0 0 14px;
+`;
 
+const DiaHabito = styled.div`
+    &:nth-child(-n+6) {
+        margin-right: 4px;
+    }
+
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    background: ${({id, days }) => days.includes(id) ? "rgba(207, 207, 207, 1)" : "rgba(255, 255, 255, 1)"};
+    border: 1px solid #D5D5D5;
+    font-family: 'Lexend Deca';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 19.976px;
+    color: ${({id, days }) => days.includes(id) ? "#FFFFFF" : "#DBDBDB" };
+`;

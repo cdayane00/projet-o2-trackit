@@ -7,15 +7,25 @@ import { ThreeDots } from  'react-loader-spinner';
 
 function CriaHabito({criaFormHabito, setCriaFormHabito, listaHabito}){
     const [seleciona, setSeleciona] = useState(false);
-    const [habito, setHabito] = useState({nome: "", dia: []});
+    const [habito, setHabito] = useState({nome: "", dias: []});
     const diasDaSemana = ["D","S","T","Q","Q","S","S"];
     const [carregando, setCarregando] = useState(false);
     const {usuario} = useContext(UserContext);
 
+    function selecionaDiasDaSemana(dia){
+        setSeleciona(!seleciona);
+        if(habito.dias.includes(dia)){
+            setHabito({...habito, dias: habito.dias.filter((d)=> d != dia)});
+        }
+        else{
+            setHabito({...habito, dias: [...habito.dias, dia]});
+        }
+    }
+
     function cria(event){
         event.preventDefault();
 
-        if(habito.dia.length > 0){
+        if(habito.dias.length > 0){
             setCarregando(true);
         }
         else{
@@ -24,46 +34,50 @@ function CriaHabito({criaFormHabito, setCriaFormHabito, listaHabito}){
         }
 
         const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
-        const corpo = {...habito};
+        const body = {...habito};
         const config = {
             headers: {
                 Authorization: `Bearer ${usuario.token}`,
             },
         };
-        const promise = axios.post(URL, corpo, config);
-        promise.then((response)=>{
+        const promise = axios.post(URL, body, config);
+        
+        promise.then((response) => {
             listaHabito();
             setCriaFormHabito(false);
             setCarregando(false);
-            setHabito({nome:"", dia: []});
-        });
+            setHabito({nome:"", dias: []});
+        })
         promise.catch((erro)=>{
             alert(erro.response.statusText);
             setCarregando(false);
         });
     }
 
-    function selecionaDiasDaSemana(dia){
-        setSeleciona(!seleciona);
-        if(habito.dia.includes(dia)){
-            setHabito({...habito, dia: habito.dia.filter((d)=> d != dia)});
-        }
-        else{
-            setHabito({...habito, dia: [...habito.dia, dia]});
-        }
-    }
+    
 
     return criaFormHabito === true ?(
         <CriaFormHabito onSubmit={cria}>
             <input className="input" type="text" placeholder="nome do hábito" value={habito.name} onChange={(event) => setHabito({...habito, nome: event.target.value})}/>
             <Dias>
-
+                {diasDaSemana.map((dia, i)=>{
+                    return(
+                        <Dia id={i} key={i} dias={habito.dias} onClick={()=>selecionaDiasDaSemana(i)}>
+                            <p>{dia}</p>     
+                        </Dia>
+                    );
+                })}
             </Dias>
-
-
+            <div className="CriaHabito__Footer">
+                <p onClick={() => setCriaFormHabito(false)}>Cancelar</p>
+                <button type="submit">
+                    {carregando ? <ThreeDots color="#fff" height={11} /> : "Salvar"}
+                </button>
+            </div>
         </CriaFormHabito>
-
-    )
+    ) : (
+        <></>
+    );
 }
 
 export default CriaHabito;
@@ -97,7 +111,7 @@ const CriaFormHabito = styled.form`
             color: #dbdbdb;
         }
         }
-        .CreatHabit__footer {
+        .CriaHabito__Footer {
         display: flex;
         justify-content: flex-end;
         align-items: center;
@@ -141,12 +155,12 @@ const Dia = styled.div`
     width: 30px;
     height: 30px;
     border-radius: 5px;
-    background: ${({ id, days }) =>
-        days.includes(id) ? "rgba(207, 207, 207, 1)" : "rgba(255, 255, 255, 1)"};
+    background: ${({ id, dias }) =>
+        dias.includes(id) ? "rgba(207, 207, 207, 1)" : "rgba(255, 255, 255, 1)"};
     border: 1px solid #d5d5d5;
     font-family: "Lexend Deca";
     font-style: normal;
     font-weight: 400;
     font-size: 19.976px;
-    color: ${({ id, days }) => (days.includes(id) ? "#FFFFFF" : "#DBDBDB")};`
+    color: ${({ id, dias }) => (dias.includes(id) ? "#FFFFFF" : "#DBDBDB")};`
 

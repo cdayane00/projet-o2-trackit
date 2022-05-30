@@ -1,11 +1,13 @@
 import styled from "styled-components";
-import bob from "../assets/img/bob.png"
+import {useContext} from "react";
+import UserContext from "../context/UserContext";
 
 function Topo(){
+    const {usuario} = useContext(UserContext);
     return(
         <Cabecalho>
             <p>TrackIt</p>
-            <img src={bob}/>
+            <img src={usuario.image}/>
         </Cabecalho>
     )
 }

@@ -18,13 +18,13 @@ function Hoje(){
             Authorization: `Bearer ${usuario.token}`,
         },
         };
-
+        console.log(usuario.token)
         const promise = axios.get(URL,config);
         promise.then((response)=>{
             setHabitosHoje(response.data);
             setHabitosCompletos((response.data.filter((habito)=> habito.done).length/response.data.length)*100);
         })
-        promise.catch((erro)=>{alert(erro.data.statusText)});
+        promise.catch((erro)=>{alert(erro.response.statusText)});
     }
 
     const marcaHabito = (id) =>{

@@ -7,6 +7,7 @@ import Historico from './components/Historico';
 import Topo from './components/Topo';
 import UserContext from './context/UserContext';
 import { useState } from 'react';
+import Menu from './components/Menu';
 
 function App(){
     const [usuario, setUsuario] = useState(
@@ -14,14 +15,18 @@ function App(){
         ? JSON.parse(localStorage.getItem('userdata'))
         : null
     );
+    
     const location = useLocation();
     const [habitosCompletos, setHabitosCompletos] = useState(0);
+    console.log(usuario);
     return(
         <UserContext.Provider value={{usuario,setUsuario,habitosCompletos, setHabitosCompletos}}>
-            {!(location.pathname === "/" || location.pathname === "/")
+            {!(location.pathname === "/" || location.pathname === "/cadastro")
             ? (
                 <>
                     <Topo/>
+                    <Menu/>
+                    
                 </>
             ) : (<></>)
             }
